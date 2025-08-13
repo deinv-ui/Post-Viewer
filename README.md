@@ -1,12 +1,84 @@
-# React + Vite
+# Post Viewer
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+![React](https://img.shields.io/badge/React-61DAFB?logo=react&logoColor=white)
+![TailwindCSS](https://img.shields.io/badge/TailwindCSS-38B2AC?logo=tailwind-css&logoColor=white)
+![License](https://img.shields.io/badge/License-MIT-green)
 
-Currently, two official plugins are available:
+A small React project to display posts with images, user info, and a like feature. Uses **React**, **TailwindCSS**, **React Query**, and **Zustand** for state management.  
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+---
 
-## Expanding the ESLint configuration
+## Features
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- Fetch posts from a placeholder API  
+- Display post images, title, and user avatar  
+- Like/unlike posts with **animation**  
+- Like count updates **optimistically**  
+- Global state management with **Zustand**  
+- Responsive layout using **TailwindCSS columns**  
+- Skeleton loading placeholders while fetching posts  
+
+---
+
+## Tech Stack
+
+- **React** – Frontend library  
+- **TailwindCSS** – Styling  
+- **React Query** – Data fetching and caching  
+- **Zustand** – Global state management  
+- **React Icons** – Icons for UI  
+- **Picsum.photos** – Placeholder images  
+
+---
+
+## Installation
+
+1. Clone the repository:
+
+```bash
+git clone https://github.com/YOUR_USERNAME/YOUR_REPO.git
+cd YOUR_REPO
+```
+2. Install dependencies:
+
+```bash
+pnpm install
+# or
+npm install
+# or
+yarn install
+```
+3. Start the development server:
+```bash
+pnpm dev
+# or
+npm run dev
+# or
+yarn dev
+```
+bash
+4. Open in browser: http://localhost:5173
+
+## Folder Structure
+```bash
+src/
+ ├─ components/       # Reusable components (PostCard, Icons, etc.)
+ ├─ stores/           # Zustand store for post state
+ ├─ utils/            # Utility functions (API, image dimensions)
+ ├─ pages/            # Main page components
+ └─ App.jsx           # Root component
+```
+## Usage
+Click on a post to open the modal (or trigger any action you implement)
+
+Click the heart icon to like/unlike a post
+
+Likes update immediately with a bg-red animation
+
+## Future Improvements
+Add infinite scrolling for posts
+
+Add comments and user interactions
+
+Add live chatting function using websocket etc
+Persist likes in local storage or backend
