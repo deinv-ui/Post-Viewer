@@ -56,7 +56,7 @@ npm run dev
 # or
 yarn dev
 ```
-bash
+
 4. Open in browser: http://localhost:5173
 
 ## Folder Structure
