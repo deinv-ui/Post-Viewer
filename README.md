@@ -4,7 +4,7 @@
 ![TailwindCSS](https://img.shields.io/badge/TailwindCSS-38B2AC?logo=tailwind-css&logoColor=white)
 ![License](https://img.shields.io/badge/License-MIT-green)
 
-A small React project to display posts with images, user info, and a like feature. Uses **React**, **TailwindCSS**, **React Query**, and **Zustand** for state management.  
+A small React project to display posts in masonry layout with images, user info, and a like feature. Uses **React**, **TailwindCSS**, **React Query**, and **Zustand** for state management.  
 
 ---
 
