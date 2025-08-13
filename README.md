@@ -83,5 +83,8 @@ Add comments and user interactions
 Add live chatting function using websocket etc
 Persist likes in local storage or backend
 
+## Screenshot
+![Post Viewer Screenshot](./screenshots/post-viewer.png)
+
 ## License
 MIT License © Tan De Xin
