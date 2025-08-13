@@ -82,3 +82,6 @@ Add comments and user interactions
 
 Add live chatting function using websocket etc
 Persist likes in local storage or backend
+
+## License
+MIT License © Tan De Xin
