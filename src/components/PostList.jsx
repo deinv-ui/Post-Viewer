@@ -82,7 +82,7 @@ export default function PostList() {
     <div className="p-4">
       {isFetching && <p className="text-sm text-gray-500 mb-2">Refreshing…</p>}
 
-      <div className="columns-2 sm:columns-3 md:columns-4 xl:columns-5 gap-4 space-y-4">
+      <div className="columns-1 sm:columns-3 md:columns-4 xl:columns-5 gap-4 space-y-4">
         {posts.map((post) => (
           <PostCard
             key={post.id}
