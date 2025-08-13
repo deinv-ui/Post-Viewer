@@ -1,5 +1,5 @@
+![Post Viewer Screenshot](./screenshots/post-viewer.png)
 # Post Viewer
-
 ![React](https://img.shields.io/badge/React-61DAFB?logo=react&logoColor=white)
 ![TailwindCSS](https://img.shields.io/badge/TailwindCSS-38B2AC?logo=tailwind-css&logoColor=white)
 ![License](https://img.shields.io/badge/License-MIT-green)
@@ -82,9 +82,6 @@ Add comments and user interactions
 
 Add live chatting function using websocket etc
 Persist likes in local storage or backend
-
-## Screenshot
-![Post Viewer Screenshot](./screenshots/post-viewer.png)
 
 ## License
 MIT License © Tan De Xin
