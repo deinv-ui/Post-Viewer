@@ -89,7 +89,7 @@ node server.js
 ```
 5. Run the frontend
 ```bash
-pnpm devs
+pnpm dev
 ```
 ## Folder Structure
 ```bash
