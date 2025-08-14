@@ -7,18 +7,38 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
-*.local
+# Dependency directories
+node_modules/
 
-# Editor directories and files
+# Build outputs
+dist/
+dist-ssr/
+build/
+
+# Local environment files (DO NOT COMMIT secrets)
+.env
+.env.local
+.env.*.local
+
+# OS / Editor junk
+.DS_Store
+Thumbs.db
+
+# VS Code / IDE
 .vscode/*
 !.vscode/extensions.json
-.idea
-.DS_Store
+.idea/
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
+
+# Testing coverage
+coverage/
+*.lcov
+
+# Optional: keep SQLite DB out of repo if used
+*.sqlite
+*.sqlite3
+*.db

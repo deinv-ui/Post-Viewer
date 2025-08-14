@@ -1,0 +1,15 @@
+// routes/likes.routes.js
+const express = require("express");
+const router = express.Router();
+const LikesController = require("../controllers/likes.controller");
+
+// Like a post
+router.post("/:postId/like", LikesController.likePost);
+
+// Unlike a post
+router.delete("/:postId/unlike", LikesController.unlikePost);
+
+// Get total likes of a post
+router.get("/:postId/likes", LikesController.getLikes);
+
+module.exports = router;
