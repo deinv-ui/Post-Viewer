@@ -108,13 +108,13 @@ frontend/
  └─ App.jsx         # Root component
 ```
 ## 🔍 API Endpoints
-**Users
+**Users**
 
 GET /users → list all users
 
 POST /users → create a new user
 
-**Posts
+**Posts**
 
 GET /posts → list all posts
 
@@ -122,7 +122,7 @@ POST /posts → create a post
 
 DELETE /posts/:id → delete a post
 
-**Likes
+**Likes**
 
 POST /posts/:id/like → like a post
 
