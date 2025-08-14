@@ -1,5 +1,5 @@
 import express from "express";
-import { fetchAndCachePrices, fetchAndCacheDividends, getCachedSeries } from "../services/marketService.js";
+import { fetchAndCachePrices, fetchAndCacheDividends, getCachedSeries } from "../services/marketServices.js";
 
 const router = express.Router();
 

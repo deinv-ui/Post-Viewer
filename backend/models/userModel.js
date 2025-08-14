@@ -24,6 +24,13 @@ export const getUserById = async (id) => {
   );
   return rows[0];
 };
+export const getUserByEmail = async (id) => {
+  const { rows } = await pool.query(
+    "SELECT email, username, created_at FROM users WHERE email = $1;",
+    [id]
+  );
+  return rows[0];
+};
 
 export const updateUser = async (id, username, email) => {
   const query = `

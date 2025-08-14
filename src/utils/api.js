@@ -1,8 +1,49 @@
-// utils/api.js
+import useAuthStore from "@/stores/authStore";
+
+const getToken = () => useAuthStore.getState().token;
+
+// Generic fetch wrapper
+export const apiFetch = async (url, options = {}) => {
+  const response = await fetch(url, options);
+  const text = await response.text();
+
+  try {
+    const data = text ? JSON.parse(text) : {};
+    if (!response.ok) throw new Error(data.error || "API request failed");
+    return data;
+  } catch {
+    console.error("Non-JSON response:", text);
+    throw new Error("Server returned non-JSON response");
+  }
+};
+
+const BASE_URL = "http://localhost:4000/api";
+
+export const registerUser = async (data) => {
+  const res = await fetch(`${BASE_URL}/users/register`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+  return res.json();
+};
+
+export const loginUser = async (data) => {
+  const res = await fetch(`${BASE_URL}/users/login`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+  return res.json();
+};
+
+export const getUsers = async () => {
+  return apiFetch("/api/users"); // middleware will check token
+};
 
 // Helper to generate random image dimensions
 function getRandomImageDimensions() {
-  const width = Math.floor(Math.random() * 200) + 300;  // 300–500
+  const width = Math.floor(Math.random() * 200) + 300; // 300–500
   const height = Math.floor(Math.random() * 400) + 200; // 200–600
   return { width, height };
 }
@@ -13,7 +54,6 @@ function getRandomAvatar(seed) {
   // Add ?format=png to get a PNG image
   return `https://avatars.dicebear.com/api/${style}/${seed}.png`;
 }
-
 
 // Helper to generate random post text
 function getRandomText(baseText) {
@@ -26,7 +66,9 @@ function getRandomText(baseText) {
 export async function getPostsWithUsers(limit = 5) {
   try {
     // Fetch posts
-    const postRes = await fetch(`https://jsonplaceholder.typicode.com/posts?_limit=${limit}`);
+    const postRes = await fetch(
+      `https://jsonplaceholder.typicode.com/posts?_limit=${limit}`
+    );
     const postData = await postRes.json();
 
     // Fetch users
@@ -40,7 +82,9 @@ export async function getPostsWithUsers(limit = 5) {
       const { width, height } = getRandomImageDimensions();
 
       // Random avatar for user
-      const avatar = getRandomAvatar(user.id + Math.floor(Math.random() * 1000));
+      const avatar = getRandomAvatar(
+        user.id + Math.floor(Math.random() * 1000)
+      );
 
       // Random post image
       const postImage = `https://source.unsplash.com/${width}x${height}/?nature,tech,${post.id}`;

@@ -6,19 +6,12 @@ import { getImageDimensions } from "@/utils/globalFunction";
 export default function PostList() {
   const queryClient = useQueryClient();
 
-  // Fetch posts
-  const {
-    data: posts = [],
-    isLoading,
-    isError,
-    error,
-    isFetching,
-  } = useQuery({
+  const { data: posts = [], isLoading, isError, error, isFetching } = useQuery({
     queryKey: ["posts"],
     queryFn: () => getPostsWithUsers(20),
-    staleTime: 1000 * 60, // 1 min before considering stale
-    cacheTime: 1000 * 60 * 5, // keep in cache for 5 mins
-    retry: 2, // retry failed fetches twice
+    staleTime: 1000 * 60,
+    cacheTime: 1000 * 60 * 5,
+    retry: 2,
   });
 
   const likeMutation = useMutation({
@@ -40,8 +33,8 @@ export default function PostList() {
     });
 
     return (
-      <div className="p-4">
-        <div className="columns-2 sm:columns-3 md:columns-4 xl:columns-5 gap-4 space-y-4">
+      <div className="p-2">
+        <div className="columns-1 sm:columns-2 md:columns-3 xl:columns-4 gap-4 space-y-4">
           {mockPosts.map((post) => (
             <div
               key={post.id}
@@ -79,10 +72,10 @@ export default function PostList() {
   };
 
   return (
-    <div className="p-4">
+    <div className="p-2 overflow-x-hidden">
       {isFetching && <p className="text-sm text-gray-500 mb-2">Refreshing…</p>}
 
-      <div className="columns-1 sm:columns-3 md:columns-4 xl:columns-5 gap-4 space-y-4">
+      <div className="columns-1 sm:columns-2 md:columns-3 xl:columns-4 gap-4 space-y-4">
         {posts.map((post) => (
           <PostCard
             key={post.id}
