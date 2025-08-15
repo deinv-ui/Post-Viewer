@@ -13,7 +13,9 @@ export const createUser = async (username, email, passwordHash) => {
 };
 
 export const getAllUsers = async () => {
-  const { rows } = await pool.query("SELECT id, username, email, created_at FROM users;");
+  const { rows } = await pool.query(
+    "SELECT id, username, email, created_at FROM users;"
+  );
   return rows;
 };
 
@@ -24,11 +26,14 @@ export const getUserById = async (id) => {
   );
   return rows[0];
 };
-export const getUserByEmail = async (id) => {
+export const getUserByEmail = async (email) => {
+  const normalizedEmail = email.toLowerCase().trim();
   const { rows } = await pool.query(
-    "SELECT email, username, created_at FROM users WHERE email = $1;",
-    [id]
+    "SELECT id, username, email, password_hash FROM users WHERE LOWER(email) = $1;",
+    [normalizedEmail]
   );
+
+  console.log("DB query result:", rows[0]); // Debug
   return rows[0];
 };
 
