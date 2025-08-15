@@ -1,20 +1,32 @@
 import { FaUser, FaLock, FaArrowRight, FaChevronRight } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-import useAuthStore from "@/stores/authStore";
 import { loginUser } from "@/utils/api";
+import { useEffect } from "react";
+import useAuthStore, { isTokenValid } from "@/stores/authStore";
 
 export default function Login() {
   const navigate = useNavigate();
-  const { email, password, setEmail, setPassword, setToken } = useAuthStore();
+  const { email, password, setEmail, setPassword, setToken, token, setUser, } =
+    useAuthStore();
 
+  // Auto-redirect if already logged in
+  useEffect(() => {
+    if (token && isTokenValid(token)) {
+      navigate("/dashboard", { replace: true });
+    }
+  }, [token, navigate]);
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
       const data = await loginUser({ email, password });
+
+      if (!data?.token) throw new Error("Login failed: no token received");
+
       setToken(data.token);
-      navigate("/dashboard");
+      setUser(data.user);
+      navigate("/dashboard", { replace: true });
     } catch (err) {
-      alert(err.message);
+      alert(err.message || "Login failed");
     }
   };
 

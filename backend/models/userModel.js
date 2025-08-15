@@ -29,7 +29,7 @@ export const getUserById = async (id) => {
 export const getUserByEmail = async (email) => {
   const normalizedEmail = email.toLowerCase().trim();
   const { rows } = await pool.query(
-    "SELECT id, username, email, password_hash FROM users WHERE LOWER(email) = $1;",
+    "SELECT id, username, email, password_hash, avatar_url FROM users WHERE LOWER(email) = $1;",
     [normalizedEmail]
   );
 

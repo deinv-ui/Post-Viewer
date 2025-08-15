@@ -71,12 +71,16 @@ export default function Navbar({ onToggle }) {
           <a
             key={idx}
             href="#"
+            onClick={(e) => {
+              e.preventDefault(); // prevent scrolling to top
+              if (item.action) item.action(); // call the action
+            }}
             className={`flex items-center gap-3 p-2 rounded-lg transition-all duration-300
-              ${
-                expanded
-                  ? "text-gray-900 hover:bg-gray-200"
-                  : "justify-center text-white hover:bg-gray-700"
-              }`}
+      ${
+        expanded
+          ? "text-gray-900 hover:bg-gray-200"
+          : "justify-center text-white hover:bg-gray-700"
+      }`}
           >
             <span className="text-xl">{item.icon}</span>
             <span

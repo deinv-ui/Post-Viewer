@@ -28,40 +28,32 @@ export const createUser = async (req, res) => {
   }
 };
 
+
 export const loginUser = async (req, res) => {
   try {
-    let { email, password } = req.body;
-console.log("Login payload:", req.body);
-
-    // Normalize email
-    email = email.toLowerCase().trim();
-
-    // 1. Find user
+    const { email, password } = req.body;
     const user = await UserModel.getUserByEmail(email);
-    if (!user) {
-      return res.status(401).json({ error: "Invalid credentials" });
-    }
+    if (!user) return res.status(401).json({ error: "Invalid credentials" });
 
-    console.log("Incoming password:", password);
-    console.log("User password hash from DB:", user.password_hash);
-
-    // 2. Compare plain password with stored hash
     const isMatch = await bcrypt.compare(password, user.password_hash);
-    if (!isMatch) {
-      return res.status(401).json({ error: "Invalid credentials" });
-    }
+    if (!isMatch) return res.status(401).json({ error: "Invalid credentials" });
 
-    // 3. Success
-    res.status(200).json({ message: "Login successful", user });
+    // Create JWT
+    const token = jwt.sign(
+      { id: user.id, email: user.email },
+      process.env.JWT_SECRET || "supersecretkey",
+      { expiresIn: "1h" }
+    );
+
+    res.status(200).json({
+      message: "Login successful",
+      token,
+      user: { id: user.id, username: user.username, email: user.email ,user_url: user.avatar_url },
+    });
   } catch (err) {
-    console.error("Error during login:", err);
     res.status(500).json({ error: "Login failed" });
   }
 };
-
-
-
-
 // controllers/userController.js
 
 export const getUsers = async (req, res) => {
@@ -74,7 +66,7 @@ export const getUsers = async (req, res) => {
   }
 };
 
-export const getUser = async (req, res) => {
+export const getUserById = async (req, res) => {
   try {
     const user = await UserModel.getUserById(req.params.id);
     if (!user) return res.status(404).json({ error: "User not found" });
