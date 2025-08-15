@@ -9,8 +9,7 @@ export default function Dashboard() {
   // Get user info from the store
   const token = useAuthStore((state) => state.token);
   const user = useAuthStore((state) => state.user);
-  const avatarUrl = user?.avatar_url + "?t=" + new Date().getTime();
-
+  console.log("User:", user);
   return (
     <div className="flex w-full min-h-screen bg-gray-50 overflow-hidden">
       <div
@@ -34,7 +33,7 @@ export default function Dashboard() {
               {user?.email || ""}
             </span>
             <img
-              src={avatarUrl || "/src/assets/user_avatar.png"}
+              src={user?.avatar_url || "/src/assets/user_avatar.png"}
               alt="User Avatar"
               className="w-10 h-10 rounded-full flex-shrink-0"
             />
