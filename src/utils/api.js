@@ -19,6 +19,19 @@ export const apiFetch = async (url, options = {}) => {
 
 const BASE_URL = "http://localhost:4000/api";
 
+export const fetchTopGainers = async () => {
+  return apiFetch(`${BASE_URL}/finance/top-gainers`);
+};
+
+export const fetchHighDividend = async () => {
+  return apiFetch(`${BASE_URL}/finance/high-dividend`);
+};
+
+export const fetchStableStocks = async () => {
+  return apiFetch(`${BASE_URL}/finance/stable-stocks`);
+};
+
+//Auth
 export const registerUser = async (data) => {
   const res = await fetch(`${BASE_URL}/users/register`, {
     method: "POST",

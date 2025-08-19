@@ -7,6 +7,7 @@ import {
 } from "react-router-dom";
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
+import Portfolio from "./pages/Portfolio/index";
 import Dashboard from "./pages/Dashboard";
 import ProtectedRoute from "./components/ProtectedRoute";
 import useAuthStore, { isTokenValid } from "@/stores/authStore";
@@ -20,6 +21,7 @@ export default function App() {
         {/* Auth pages */}
         <Route path="/auth/login" element={<Login />} />
         <Route path="/auth/register" element={<Register />} />
+        <Route path="/portfolio" element={<Portfolio />} />
 
         {/* Protected dashboard */}
         <Route
@@ -27,6 +29,7 @@ export default function App() {
           element={
             <ProtectedRoute>
               <Dashboard />
+
             </ProtectedRoute>
           }
         />

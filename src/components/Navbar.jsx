@@ -19,7 +19,11 @@ export default function Navbar({ onToggle }) {
       icon: <FaHome />,
       action: () => navigate("/dashboard"),
     },
-    { name: "Portfolio", icon: <FaChartLine /> },
+    {
+      name: "Portfolio",
+      icon: <FaChartLine />,
+      action: () => navigate("/portfolio"), 
+    },
     { name: "Profile", icon: <FaUser /> },
     {
       name: "Logout",

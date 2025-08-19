@@ -1,12 +1,14 @@
-import { FaUser, FaLock, FaArrowRight, FaChevronRight } from "react-icons/fa";
+import { FaUser, FaLock, FaEye, FaEyeSlash } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { loginUser } from "@/utils/api";
-import { useEffect } from "react";
+import { useEffect, useState, } from "react";
 import useAuthStore, { isTokenValid } from "@/stores/authStore";
 
 export default function Login() {
   const navigate = useNavigate();
-  const { email, password, setEmail, setPassword, setToken, token, setUser, } =
+  const [showPassword, setShowPassword] = useState(false);
+
+  const { email, password, setEmail, setPassword, setToken, token, setUser } =
     useAuthStore();
 
   // Auto-redirect if already logged in
@@ -73,13 +75,20 @@ export default function Login() {
 
                 <div className="relative">
                   <input
-                    type="password"
+                    type={showPassword ? "text" : "password"} // <-- toggle type
                     placeholder="Password"
-                    className="w-full bg-gray-700 text-white pl-12 pr-4 py-3 rounded-xl border border-gray-600 focus:border-yellow-400 focus:outline-none transition-colors"
+                    className="w-full bg-gray-700 text-white pl-12 pr-12 py-3 rounded-xl border border-gray-600 focus:border-yellow-400 focus:outline-none transition-colors"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute top-1/2 right-3 transform -translate-y-1/2 text-gray-400 hover:text-yellow-400"
+                  >
+                    {showPassword ? <FaEyeSlash /> : <FaEye />}
+                  </button>
                 </div>
 
                 <button

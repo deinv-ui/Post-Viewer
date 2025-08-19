@@ -2,6 +2,7 @@
 import express from "express";
 import userRoutes from "./routes/userRoutes.js";
 import marketRoutes from "./routes/marketRoutes.js";
+import financeRoutes from "./routes/financeRoutes.js";
 import postRoutes from "./routes/postRoutes.js";
 import cors from "cors";
 import compression from "compression";
@@ -43,6 +44,7 @@ app.use(express.json());
 app.use("/api/posts", postRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/market", marketRoutes);
+app.use("/api/finance", financeRoutes);
 
 // Test route
 app.get("/", (req, res) => {
