@@ -30,6 +30,10 @@ export const fetchHighDividend = async () => {
 export const fetchStableStocks = async () => {
   return apiFetch(`${BASE_URL}/finance/stable-stocks`);
 };
+export const searchStocks = async (query) => {
+  if (!query) return []; // empty query = no results
+  return apiFetch(`${BASE_URL}/finance/search?q=${encodeURIComponent(query)}`);
+};
 
 //Auth
 export const registerUser = async (data) => {
