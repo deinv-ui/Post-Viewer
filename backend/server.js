@@ -16,8 +16,7 @@ app.use(compression());
 const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:5174",
-  "https://blink-35v7a9zo9-deinv-uis-projects.vercel.app",
-
+  "https://blink-dx.vercel.app",
 ];
 
 // Dynamic CORS
@@ -37,7 +36,6 @@ app.use(
     credentials: true,
   })
 );
-
 
 // Parse JSON requests
 app.use(express.json());
