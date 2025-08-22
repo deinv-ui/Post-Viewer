@@ -1,12 +1,20 @@
 import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { fetchTopGainers, fetchHighDividend, fetchStableStocks } from "@/utils/api";
-import { Bar } from "react-chartjs-2";
+import {
+  fetchTopGainers,
+  fetchHighDividend,
+  fetchStableStocks,
+} from "@/utils/api";
+import { Bar, Line } from "react-chartjs-2";
+import PortfolioChart from "@/components/Portfolio/PortfolioChart.jsx";
+import DividendTracker from "@/components/Portfolio/DividendTracker.jsx";
 import {
   Chart as ChartJS,
   CategoryScale,
   LinearScale,
   BarElement,
+  PointElement,
+  LineElement,
   Title,
   Tooltip,
   Legend,
@@ -18,111 +26,197 @@ import {
   FiShield,
   FiSearch,
   FiX,
+  FiCalendar,
+  FiBarChart2,
 } from "react-icons/fi";
 import MainLayout from "@/layouts/MainLayout";
 
-ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend
+);
+
+// 🔧 Utility: build chart data
+const buildChartData = ({ data, field, type }) => {
+  const labels = data.map((s) => s.symbol);
+  const dataset = {
+    label: field === "dividendYield" ? "Dividend %" : "Price (RM)",
+    data: data.map((s) =>
+      field === "dividendYield" ? s[field] * 100 : s[field]
+    ),
+    backgroundColor:
+      field === "dividendYield"
+        ? "rgba(54, 162, 235, 0.7)"
+        : "rgba(34, 197, 94, 0.7)",
+    borderColor: "rgba(34,197,94,1)",
+    fill: type === "line",
+    tension: type === "line" ? 0.3 : 0,
+    borderRadius: type === "bar" ? 8 : 0,
+  };
+  return { labels, datasets: [dataset] };
+};
+
+// 📦 Reusable Card
+const StockCard = ({ s }) => {
+  const positive = s.regularMarketChangePercent > 0;
+  return (
+    <div className="p-5 rounded-2xl shadow-lg hover:-translate-y-1 hover:shadow-xl transition-transform bg-white">
+      <div className="flex justify-between items-center mb-2">
+        <h3 className="font-bold text-lg">
+          {s.name} <span className="text-gray-500">({s.symbol})</span>
+        </h3>
+        {positive ? (
+          <FiTrendingUp className="text-green-500 text-xl" />
+        ) : (
+          <FiTrendingDown className="text-red-500 text-xl" />
+        )}
+      </div>
+      <p className="text-2xl font-semibold">
+        RM {s.regularMarketPrice?.toFixed(2)}
+      </p>
+      <p
+        className={`font-medium ${
+          positive ? "text-green-600" : "text-red-600"
+        }`}
+      >
+        {s.regularMarketChangePercent?.toFixed(2)}%
+      </p>
+      {s.dividendYield && (
+        <div className="flex items-center gap-2 mt-2 text-blue-600">
+          <FiDollarSign /> {(s.dividendYield * 100).toFixed(2)}% Yield
+        </div>
+      )}
+      {s.beta !== undefined && (
+        <div className="flex items-center gap-2 mt-1 text-gray-500 text-sm">
+          <FiShield /> Beta: {s.beta.toFixed(2)}
+        </div>
+      )}
+    </div>
+  );
+};
+
+// 📦 Reusable Section
+const StockSection = ({ title, icon, data, field, type = "bar", search }) => {
+  const ChartComponent = type === "bar" ? Bar : Line;
+  const chartData = buildChartData({ data, field, type });
+  const filtered = data.filter(
+    (s) =>
+      s.name.toLowerCase().includes(search.toLowerCase()) ||
+      s.symbol.toLowerCase().includes(search.toLowerCase())
+  );
+
+  return (
+    <section className="mb-12">
+      <h2 className="text-2xl font-semibold mb-4">
+        {icon} {title}
+      </h2>
+      <div className="bg-white rounded-2xl shadow p-6">
+        <ChartComponent data={chartData} />
+      </div>
+      <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        {filtered.map((s) => (
+          <StockCard key={s.symbol} s={s} />
+        ))}
+      </div>
+    </section>
+  );
+};
 
 export default function Portfolio() {
+  // queries
   const { data: topGainers = [], isLoading: loadingGainers } = useQuery({
     queryKey: ["topGainers"],
     queryFn: fetchTopGainers,
   });
-
   const { data: highDividends = [], isLoading: loadingDividends } = useQuery({
     queryKey: ["highDividends"],
     queryFn: fetchHighDividend,
   });
-
   const { data: stableStocks = [], isLoading: loadingStable } = useQuery({
     queryKey: ["stableStocks"],
     queryFn: fetchStableStocks,
   });
 
+  // state
   const [search, setSearch] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [portfolioName, setPortfolioName] = useState("");
   const [portfolioDesc, setPortfolioDesc] = useState("");
 
-  if (loadingGainers || loadingDividends || loadingStable) {
-    return <div className="flex items-center justify-center h-screen text-lg">Loading...</div>;
-  }
-
-  const createChartData = (data, field) => ({
-    labels: data.map((s) => s.symbol),
-    datasets: [
-      {
-        label: field === "dividendYield" ? "Dividend %" : "Price (RM)",
-        data: data.map((s) =>
-          field === "dividendYield" ? s[field] * 100 : s[field]
-        ),
-        backgroundColor:
-          field === "dividendYield"
-            ? "rgba(54, 162, 235, 0.7)"
-            : "rgba(34, 197, 94, 0.7)",
-        borderRadius: 8,
-      },
-    ],
+  // dummy dividends
+  const dividendData = [
+    {
+      company: "MAYBANK",
+      amount: 40.0,
+      exDate: "2025-03-10",
+      payDate: "2025-03-25",
+    },
+    {
+      company: "TENAGA",
+      amount: 25.5,
+      exDate: "2025-04-05",
+      payDate: "2025-04-20",
+    },
+    {
+      company: "PETDAG",
+      amount: 50.0,
+      exDate: "2025-05-01",
+      payDate: "2025-05-15",
+    },
+  ];
+  const totalDividends = dividendData.reduce((sum, d) => sum + d.amount, 0);
+  const dividendChartData = buildChartData({
+    data: dividendData,
+    field: "amount",
+    type: "line",
   });
+  const [portfolioData] = useState([
+    { date: "2025-01-01", value: 10000 },
+    { date: "2025-02-01", value: 12000 },
+    { date: "2025-03-01", value: 11500 },
+    { date: "2025-04-01", value: 14000 },
+  ]);
+  // dummy holdings
+  const myHoldings = [
+    { symbol: "MAYBANK", name: "Maybank", qty: 100, avgCost: 8.5, price: 9.2 },
+    {
+      symbol: "TENAGA",
+      name: "Tenaga Nasional",
+      qty: 50,
+      avgCost: 9.0,
+      price: 10.1,
+    },
+    {
+      symbol: "PETDAG",
+      name: "Petronas Dagangan",
+      qty: 30,
+      avgCost: 20.0,
+      price: 22.5,
+    },
+  ];
+  const totalValue = myHoldings.reduce((sum, h) => sum + h.qty * h.price, 0);
+  const totalCost = myHoldings.reduce((sum, h) => sum + h.qty * h.avgCost, 0);
+  const totalPL = totalValue - totalCost;
+  const totalPLPercent = (totalPL / totalCost) * 100;
 
-  const StockCard = ({ s }) => {
-    const positive = s.regularMarketChangePercent > 0;
+  if (loadingGainers || loadingDividends || loadingStable) {
     return (
-      <div className="p-5 rounded-2xl shadow-lg transition-transform transform hover:-translate-y-1 hover:shadow-xl bg-white text-gray-900">
-        <div className="flex justify-between items-center mb-2">
-          <h3 className="font-bold text-lg">
-            {s.name} <span className="text-gray-500">({s.symbol})</span>
-          </h3>
-          {positive ? (
-            <FiTrendingUp className="text-green-500 text-xl" />
-          ) : (
-            <FiTrendingDown className="text-red-500 text-xl" />
-          )}
-        </div>
-        <p className="text-2xl font-semibold">
-          RM {s.regularMarketPrice?.toFixed(2)}
-        </p>
-        <p
-          className={`font-medium ${
-            positive ? "text-green-600" : "text-red-600"
-          }`}
-        >
-          {s.regularMarketChangePercent?.toFixed(2)}%
-        </p>
-        {s.dividendYield && (
-          <div className="flex items-center gap-2 mt-2 text-blue-600">
-            <FiDollarSign className="text-lg" />{" "}
-            {(s.dividendYield * 100).toFixed(2)}% Yield
-          </div>
-        )}
-        {s.beta !== undefined && (
-          <div className="flex items-center gap-2 mt-1 text-gray-500 text-sm">
-            <FiShield className="text-base" /> Beta: {s.beta.toFixed(2)}
-          </div>
-        )}
+      <div className="flex items-center justify-center h-screen text-lg">
+        Loading...
       </div>
     );
-  };
-
-  // 🔍 filter stocks based on search
-  const filterStocks = (stocks) =>
-    stocks.filter(
-      (s) =>
-        s.name.toLowerCase().includes(search.toLowerCase()) ||
-        s.symbol.toLowerCase().includes(search.toLowerCase())
-    );
-
-  const handleSavePortfolio = () => {
-    console.log("New Portfolio:", { portfolioName, portfolioDesc });
-    setShowModal(false);
-    setPortfolioName("");
-    setPortfolioDesc("");
-  };
+  }
 
   return (
     <MainLayout>
       <div className="p-8">
-        {/* Header with search + button */}
+        {/* Header */}
         <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-8 gap-4">
           <h1 className="text-3xl font-bold">Portfolio Overview</h1>
           <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-xl shadow w-full md:w-96">
@@ -143,44 +237,40 @@ export default function Portfolio() {
           </button>
         </div>
 
-        {/* Top Gainers */}
+        {/* Portfolio Summary */}
         <section className="mb-12">
-          <h2 className="text-2xl font-semibold mb-4">🚀 Top Gainers</h2>
-          <div className="bg-white rounded-2xl shadow p-6">
-            <Bar data={createChartData(topGainers, "regularMarketPrice")} />
-          </div>
-          <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {filterStocks(topGainers).map((s) => (
-              <StockCard key={s.symbol} s={s} />
-            ))}
-          </div>
+          <PortfolioChart data={portfolioData} />
+        </section>
+        <section className="mb-12">
+          {/* Dividend Tracker */}
+          <DividendTracker dividends={dividendData} />
         </section>
 
-        {/* High Dividend Stocks */}
-        <section className="mb-12">
-          <h2 className="text-2xl font-semibold mb-4">💰 High Dividend Stocks</h2>
-          <div className="bg-white rounded-2xl shadow p-6">
-            <Bar data={createChartData(highDividends, "dividendYield")} />
-          </div>
-          <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {filterStocks(highDividends).map((s) => (
-              <StockCard key={s.symbol} s={s} />
-            ))}
-          </div>
-        </section>
-
-        {/* Stable Stocks */}
-        <section>
-          <h2 className="text-2xl font-semibold mb-4">🛡️ Stable Stocks</h2>
-          <div className="bg-white rounded-2xl shadow p-6">
-            <Bar data={createChartData(stableStocks, "regularMarketPrice")} />
-          </div>
-          <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {filterStocks(stableStocks).map((s) => (
-              <StockCard key={s.symbol} s={s} />
-            ))}
-          </div>
-        </section>
+        {/* Market Sections */}
+        <StockSection
+          title="Top Gainers"
+          icon="🚀"
+          data={topGainers}
+          field="regularMarketPrice"
+          type="bar"
+          search={search}
+        />
+        <StockSection
+          title="High Dividend Stocks"
+          icon="💰"
+          data={highDividends}
+          field="dividendYield"
+          type="bar"
+          search={search}
+        />
+        <StockSection
+          title="Stable Stocks"
+          icon="🛡️"
+          data={stableStocks}
+          field="regularMarketPrice"
+          type="bar"
+          search={search}
+        />
       </div>
 
       {/* Modal */}
@@ -225,7 +315,15 @@ export default function Portfolio() {
                 Cancel
               </button>
               <button
-                onClick={handleSavePortfolio}
+                onClick={() => {
+                  console.log("New Portfolio:", {
+                    portfolioName,
+                    portfolioDesc,
+                  });
+                  setShowModal(false);
+                  setPortfolioName("");
+                  setPortfolioDesc("");
+                }}
                 className="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700"
               >
                 Save
