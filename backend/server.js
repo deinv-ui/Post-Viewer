@@ -23,10 +23,12 @@ const allowedOrigins = [
 app.use(
   cors({
     origin: function (origin, callback) {
-      // allow requests with no origin (like mobile apps or curl)
       if (!origin) return callback(null, true);
 
-      if (allowedOrigins.includes(origin)) {
+      if (
+        allowedOrigins.includes(origin) ||
+        /\.vercel\.app$/.test(new URL(origin).hostname)
+      ) {
         return callback(null, true);
       } else {
         return callback(new Error("CORS not allowed for this origin"));
@@ -36,6 +38,7 @@ app.use(
     credentials: true,
   })
 );
+
 
 // Parse JSON requests
 app.use(express.json());
