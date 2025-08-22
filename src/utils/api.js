@@ -17,8 +17,8 @@ export const apiFetch = async (url, options = {}) => {
   }
 };
 
-// const BASE_URL = "http://localhost:4000/api";
-const BASE_URL = "https://blink-1m6m.onrender.com";
+const BASE_URL = "http://localhost:4000/api";
+// const BASE_URL = "https://blink-1m6m.onrender.com";
 export const fetchTopGainers = async () => {
   return apiFetch(`${BASE_URL}/finance/top-gainers`);
 };
