@@ -26,6 +26,7 @@ import {
   FiShield,
   FiSearch,
   FiX,
+  FiPlus,
   FiCalendar,
   FiBarChart2,
 } from "react-icons/fi";
@@ -129,6 +130,27 @@ const StockSection = ({ title, icon, data, field, type = "bar", search }) => {
 };
 
 export default function Portfolio() {
+  // inside Portfolio component
+  const [portfolios, setPortfolios] = useState([]);
+
+  const [holdings, setHoldings] = useState([
+    { stock: "", qty: "", purchasePrice: "" },
+  ]);
+
+  const addHolding = () => {
+    setHoldings([...holdings, { stock: "", qty: "", purchasePrice: "" }]);
+  };
+
+  const updateHolding = (index, field, value) => {
+    const newHoldings = [...holdings];
+    newHoldings[index][field] = value;
+    setHoldings(newHoldings);
+  };
+
+  const removeHolding = (index) => {
+    setHoldings(holdings.filter((_, i) => i !== index));
+  };
+
   // queries
   const { data: topGainers = [], isLoading: loadingGainers } = useQuery({
     queryKey: ["topGainers"],
@@ -148,6 +170,9 @@ export default function Portfolio() {
   const [showModal, setShowModal] = useState(false);
   const [portfolioName, setPortfolioName] = useState("");
   const [portfolioDesc, setPortfolioDesc] = useState("");
+  const [newStock, setNewStock] = useState("");
+  const [newQty, setNewQty] = useState("");
+  const [newPrice, setNewPrice] = useState("");
 
   // dummy dividends
   const dividendData = [
@@ -245,6 +270,39 @@ export default function Portfolio() {
           {/* Dividend Tracker */}
           <DividendTracker dividends={dividendData} />
         </section>
+        {/* My Portfolios */}
+        {portfolios.length > 0 && (
+          <section className="mb-12">
+            <h2 className="text-2xl font-semibold mb-4">My Portfolios</h2>
+            <div className="space-y-4">
+              {portfolios.map((p) => (
+                <div key={p.id} className="p-4 rounded-xl shadow bg-white">
+                  <h3 className="text-lg font-bold">{p.name}</h3>
+                  <p className="text-gray-600 mb-3">{p.desc}</p>
+
+                  <table className="w-full text-sm border">
+                    <thead>
+                      <tr className="bg-gray-100 text-left">
+                        <th className="px-2 py-1">Stock</th>
+                        <th className="px-2 py-1">Qty</th>
+                        <th className="px-2 py-1">Purchase Price</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {p.holdings.map((h, i) => (
+                        <tr key={i} className="border-t">
+                          <td className="px-2 py-1">{h.stock}</td>
+                          <td className="px-2 py-1">{h.qty}</td>
+                          <td className="px-2 py-1">RM {h.purchasePrice}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
 
         {/* Market Sections */}
         <StockSection
@@ -274,64 +332,175 @@ export default function Portfolio() {
       </div>
 
       {/* Modal */}
-      {showModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="bg-white p-6 rounded-2xl shadow-lg w-full max-w-md relative">
-            <button
-              onClick={() => setShowModal(false)}
-              className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
-            >
-              <FiX size={20} />
-            </button>
-            <h2 className="text-xl font-bold mb-4">Create New Portfolio</h2>
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700">
-                Portfolio Name
-              </label>
-              <input
-                type="text"
-                value={portfolioName}
-                onChange={(e) => setPortfolioName(e.target.value)}
-                className="mt-1 w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="My Growth Portfolio"
-              />
-            </div>
-            <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-700">
-                Description
-              </label>
-              <textarea
-                value={portfolioDesc}
-                onChange={(e) => setPortfolioDesc(e.target.value)}
-                className="mt-1 w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Short description..."
-              />
-            </div>
-            <div className="flex justify-end gap-3">
-              <button
-                onClick={() => setShowModal(false)}
-                className="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={() => {
-                  console.log("New Portfolio:", {
-                    portfolioName,
-                    portfolioDesc,
-                  });
-                  setShowModal(false);
-                  setPortfolioName("");
-                  setPortfolioDesc("");
-                }}
-                className="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700"
-              >
-                Save
-              </button>
-            </div>
-          </div>
+  {showModal && (
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+    <div className="bg-white p-6 rounded-2xl shadow-lg w-full max-w-md relative 
+                    max-h-[90vh] flex flex-col">
+      
+      {/* Close button */}
+      <button
+        onClick={() => setShowModal(false)}
+        className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+      >
+        <FiX size={20} />
+      </button>
+
+      <h2 className="text-xl font-bold mb-4">Create New Portfolio</h2>
+
+      {/* Scrollable content */}
+      <div className="overflow-y-auto pr-2 space-y-6 flex-1">
+        {/* Portfolio Name */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700">
+            Portfolio Name
+          </label>
+          <input
+            type="text"
+            value={portfolioName}
+            onChange={(e) => setPortfolioName(e.target.value)}
+            className="mt-1 w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="My Growth Portfolio"
+          />
         </div>
-      )}
+
+        {/* Description */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700">
+            Description
+          </label>
+          <textarea
+            value={portfolioDesc}
+            onChange={(e) => setPortfolioDesc(e.target.value)}
+            className="mt-1 w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Short description..."
+          />
+        </div>
+
+        {/* Stock Section */}
+        <h3 className="text-lg font-semibold">📥 Initial Holdings</h3>
+        <div className="space-y-4">
+          {holdings.map((h, idx) => (
+            <div
+              key={idx}
+              className="p-4 border rounded-xl relative bg-white shadow-sm hover:shadow-md transition"
+            >
+              {/* Remove button */}
+              {holdings.length > 1 && (
+                <button
+                  onClick={() =>
+                    setHoldings(holdings.filter((_, i) => i !== idx))
+                  }
+                  className="absolute top-3 right-3 text-gray-400 hover:text-red-500"
+                >
+                  <FiX size={18} />
+                </button>
+              )}
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                {/* Stock Symbol */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Stock Symbol
+                  </label>
+                  <input
+                    type="text"
+                    value={h.stock}
+                    onChange={(e) => {
+                      const newHoldings = [...holdings];
+                      newHoldings[idx].stock = e.target.value;
+                      setHoldings(newHoldings);
+                    }}
+                    className="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="MAYBANK"
+                  />
+                </div>
+
+                {/* Quantity */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Quantity
+                  </label>
+                  <input
+                    type="number"
+                    value={h.qty}
+                    onChange={(e) => {
+                      const newHoldings = [...holdings];
+                      newHoldings[idx].qty = e.target.value;
+                      setHoldings(newHoldings);
+                    }}
+                    className="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="100"
+                  />
+                </div>
+
+                {/* Purchase Price */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Purchase Price (RM)
+                  </label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    value={h.purchasePrice}
+                    onChange={(e) => {
+                      const newHoldings = [...holdings];
+                      newHoldings[idx].purchasePrice = e.target.value;
+                      setHoldings(newHoldings);
+                    }}
+                    className="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="8.50"
+                  />
+                </div>
+              </div>
+            </div>
+          ))}
+
+          {/* Add stock button */}
+          <button
+            onClick={() =>
+              setHoldings([
+                ...holdings,
+                { stock: "", qty: "", purchasePrice: "" },
+              ])
+            }
+            className="flex items-center gap-2 mt-2 px-4 py-2 rounded-lg bg-green-100 text-green-700 font-medium hover:bg-green-200 transition"
+          >
+            <FiPlus /> Add Another Stock
+          </button>
+        </div>
+      </div>
+
+      {/* Actions (stick to bottom) */}
+      <div className="flex justify-end gap-3 mt-4">
+        <button
+          onClick={() => setShowModal(false)}
+          className="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300"
+        >
+          Cancel
+        </button>
+        <button
+          onClick={() => {
+            const newPortfolio = {
+              id: Date.now(),
+              name: portfolioName,
+              desc: portfolioDesc,
+              holdings,
+            };
+            setPortfolios([...portfolios, newPortfolio]);
+            setShowModal(false);
+            setPortfolioName("");
+            setPortfolioDesc("");
+            setHoldings([{ stock: "", qty: "", purchasePrice: "" }]);
+          }}
+          className="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700"
+        >
+          Save
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
     </MainLayout>
   );
 }
